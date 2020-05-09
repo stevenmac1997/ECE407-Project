@@ -1,2 +1,3 @@
 # ECE407-Project
-Pattern Recognition I project: An attempt at a machine learning program that analyzes and tries to predict which index funds are good to buy based on historical data. It will use two or more machine learning methods
+
+I used KNN to try to predict if there is a seizure happening
