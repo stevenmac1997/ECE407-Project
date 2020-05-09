@@ -12,9 +12,12 @@ def KNN (N,data_train,data_test,loc1,loc2,train_tags,test_tags):
     confusion_matrix=[(0,0,0),(0,0,0),(0,0,0)]
     target=0 #Comparing this data cell from test set to training set
     x=0
-    row_index=0
+    i=0
     while x <= N:
-        
+        #Parses through columns
+        row_index=0
+        predicted_results=[]
+        print("\n----------------------------------------------------Processing KNN #",x,"----------------------------------------------------\n")
         while row_index < 60:
             # We find the euclidean distance
             # Compares row by row N columns of cells against training data
@@ -24,18 +27,62 @@ def KNN (N,data_train,data_test,loc1,loc2,train_tags,test_tags):
             temp_df = data_train[x]-target
             temp_df = temp_df.abs()
             
-            shortest_dist=temp_df.idxmin()
-            #print (shortest_dist)
-            cm_test=test_tags[row_index]
+            cm_train=[] #Reset training   
+            i=0         #Reset Iteration
+            while i < N:
+                #Finding the KNNs
+                #1) Find 1st location of shortest dist
+                #2) Replace with 100 so we don't find again
+                #3) Repeat N times
+                shortest_dist_loc=temp_df.idxmin()
+                cm_train.append(train_tags[shortest_dist_loc]) 
+                temp_df[shortest_dist_loc]=100
+                i+=1
+            
+
+            #Select the most occuring value out of the 5 in cm_train
+            #because that will be the nearest neighbor
+            j=0
+            count=[0,0,0] #Count = [# of epilepsy, # of normals, # of nothings]
+            while j < N:
+                if cm_train[j] == 1:
+                    count[0]+=1
+                elif cm_train[j] == 0:
+                    count[1]+=1
+                else:
+                    count[2]+=1
+                j+=1
+            
+            find_max = count.index(max(count)) #
+            if find_max == 0:
+                predicted_results.append(1)
+            elif find_max==1:
+                predicted_results.append(0)
+            elif find_max==2:
+                predicted_results.append(-1)
+            else:
+                print("Error")
+            
+
             row_index+=1
 
             #print(temp_df)
+        
+        
+        cm_test=test_tags # Test data correct result comparison variable
+        print
         
         x+=1
 
     return
 
 def main():
+
+    #CHANGE n TO AFFECT # OF NEIGHBORS TO LOOK AT FOR KNN
+    n=5 #!!!!!IMPORTANT!!!!! DETERMINES n FOR KNN !!!!!!!!
+
+
+
 
 #--------------Reading in Training Data---------------
 
@@ -48,8 +95,7 @@ def main():
     temp_epi=0
     temp_norm=0
     temp_no=0
-    #print(df_assignments)
-    #print(df)
+
     for x in df_assignments:
         if x == 1:
             temp_epi+=1
@@ -63,8 +109,6 @@ def main():
     assignment_locations.append(temp_epi-1)
     assignment_locations.append(temp_norm-1)
     assignment_locations.append(temp_no-1)
-    #print(assignment_locations)
-
 
 #-------------Reading in Test Data------------------
 
@@ -77,8 +121,7 @@ def main():
     temp_epi=0
     temp_norm=0
     temp_no=0
-    #print(df2_assignments)
-    #print(df)
+
     for x in df2_assignments:
         if x == 1:
             temp_epi+=1
@@ -92,9 +135,7 @@ def main():
     assignment_locations2.append(temp_epi-1)
     assignment_locations2.append(temp_norm-1)
     assignment_locations2.append(temp_no-1)
-    #print(assignment_locations2)
  
-    n=5 #KNN number
     KNN(n,df,df2,assignment_locations,assignment_locations2,df_assignments,df2_assignments)
         
     return
