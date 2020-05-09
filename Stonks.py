@@ -9,14 +9,16 @@ def KNN (N,data_train,data_test,loc1,loc2,train_tags,test_tags):
     #Confusiong Matrix = 1,1   1,0   1,-1
     #                    0,1   0,0   0,-1
     #                   -1,1  -1,0  -1,-1
-    confusion_matrix=[(0,0,0),(0,0,0),(0,0,0)]
+    confusion_matrix=[[0,0,0],[0,0,0],[0,0,0]]
+    confusion_matrix=pd.DataFrame(confusion_matrix)
     target=0 #Comparing this data cell from test set to training set
     x=0
     i=0
     while x <= N:
         #Parses through columns
         row_index=0
-        predicted_results=[]
+        cm_test=test_tags # holds test_tags for confusion matrix calculations
+        predicted_results=[] # Holds all the predicted results by KNN
         print("\n----------------------------------------------------Processing KNN #",x,"----------------------------------------------------\n")
         while row_index < 60:
             # We find the euclidean distance
@@ -65,21 +67,44 @@ def KNN (N,data_train,data_test,loc1,loc2,train_tags,test_tags):
             
 
             row_index+=1
-
-            #print(temp_df)
-        
-        
-        cm_test=test_tags # Test data correct result comparison variable
-        print
-        
         x+=1
+
+    iterations = len(cm_test)
+    #Time to compare predicted with actual to make confusion table
+    k=0
+    while k < iterations:
+        if predicted_results[k] == 1 and cm_test[k] == 1:
+            confusion_matrix[0][0]+=1
+        elif predicted_results[k] == 1 and cm_test[k] == 0:
+            confusion_matrix[0][1]+=1
+        elif predicted_results[k] == 1 and cm_test[k] == -1:
+            confusion_matrix[0][2]+=1
+
+        elif predicted_results[k] == 0 and cm_test[k] == 1:
+            confusion_matrix[1][0]+=1
+        elif predicted_results[k] == 0 and cm_test[k] == 0:
+            confusion_matrix[1][1]+=1
+        elif predicted_results[k] == 0 and cm_test[k] == -1:
+            confusion_matrix[1][2]+=1
+
+        elif predicted_results[k] == -1 and cm_test[k] == 1:
+            confusion_matrix[2][0]+=1
+        elif predicted_results[k] == -1 and cm_test[k] == 0:
+            confusion_matrix[2][1]+=1
+        elif predicted_results[k] == -1 and cm_test[k] == -1:
+            confusion_matrix[2][2]+=1
+        k+=1
+        
+    accuracy = (confusion_matrix[0][0]+confusion_matrix[1][1]+confusion_matrix[2][2])/iterations
+    print("Accuracy of {}-Nearest Neighbors: {}".format(N,accuracy))
+    print("Confusion Matrix\n",confusion_matrix)
 
     return
 
 def main():
 
-    #CHANGE n TO AFFECT # OF NEIGHBORS TO LOOK AT FOR KNN
-    n=5 #!!!!!IMPORTANT!!!!! DETERMINES n FOR KNN !!!!!!!!
+    #CHANGE K TO AFFECT # OF NEIGHBORS TO LOOK AT FOR KNN
+    K=5 #!!!!!IMPORTANT!!!!! DETERMINES K FOR KNN !!!!!!!!
 
 
 
@@ -136,7 +161,7 @@ def main():
     assignment_locations2.append(temp_norm-1)
     assignment_locations2.append(temp_no-1)
  
-    KNN(n,df,df2,assignment_locations,assignment_locations2,df_assignments,df2_assignments)
+    KNN(K,df,df2,assignment_locations,assignment_locations2,df_assignments,df2_assignments)
         
     return
 
