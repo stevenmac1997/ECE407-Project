@@ -2,8 +2,8 @@
 #ECE 407
 #Seizure Detection 
 #Methods: KNN
-import numpy as np
 import pandas as pd
+
 
 def KNN (N,data_train,data_test,loc1,loc2,train_tags,test_tags):
     #Confusiong Matrix = 1,1   1,0   1,-1
@@ -11,21 +11,22 @@ def KNN (N,data_train,data_test,loc1,loc2,train_tags,test_tags):
     #                   -1,1  -1,0  -1,-1
     confusion_matrix=[[0,0,0],[0,0,0],[0,0,0]]
     confusion_matrix=pd.DataFrame(confusion_matrix)
+    cm_test=test_tags # holds test_tags for confusion matrix calculations
+    iterations = len(cm_test)
     target=0 #Comparing this data cell from test set to training set
     x=0
     i=0
     while x <= N:
         #Parses through columns
         row_index=0
-        cm_test=test_tags # holds test_tags for confusion matrix calculations
         predicted_results=[] # Holds all the predicted results by KNN
         print("\n----------------------------------------------------Processing KNN #",x,"----------------------------------------------------\n")
-        while row_index < 60:
+        while row_index < iterations:
             # We find the euclidean distance
             # Compares row by row N columns of cells against training data
             # i.e cell [0][0] from test data is compared to the entire column
             #   of the training data
-            target = data_test[row_index][x]
+            target = data_test[x][row_index]
             temp_df = data_train[x]-target
             temp_df = temp_df.abs()
             
@@ -41,7 +42,6 @@ def KNN (N,data_train,data_test,loc1,loc2,train_tags,test_tags):
                 temp_df[shortest_dist_loc]=100
                 i+=1
             
-
             #Select the most occuring value out of the 5 in cm_train
             #because that will be the nearest neighbor
             j=0
@@ -64,33 +64,31 @@ def KNN (N,data_train,data_test,loc1,loc2,train_tags,test_tags):
                 predicted_results.append(-1)
             else:
                 print("Error")
-            
-
+        
             row_index+=1
         x+=1
 
-    iterations = len(cm_test)
     #Time to compare predicted with actual to make confusion table
     k=0
     while k < iterations:
         if predicted_results[k] == 1 and cm_test[k] == 1:
             confusion_matrix[0][0]+=1
         elif predicted_results[k] == 1 and cm_test[k] == 0:
-            confusion_matrix[0][1]+=1
+            confusion_matrix[1][0]+=1
         elif predicted_results[k] == 1 and cm_test[k] == -1:
-            confusion_matrix[0][2]+=1
+            confusion_matrix[2][0]+=1
 
         elif predicted_results[k] == 0 and cm_test[k] == 1:
-            confusion_matrix[1][0]+=1
+            confusion_matrix[0][1]+=1
         elif predicted_results[k] == 0 and cm_test[k] == 0:
             confusion_matrix[1][1]+=1
         elif predicted_results[k] == 0 and cm_test[k] == -1:
-            confusion_matrix[1][2]+=1
+            confusion_matrix[2][1]+=1
 
         elif predicted_results[k] == -1 and cm_test[k] == 1:
-            confusion_matrix[2][0]+=1
+            confusion_matrix[0][2]+=1
         elif predicted_results[k] == -1 and cm_test[k] == 0:
-            confusion_matrix[2][1]+=1
+            confusion_matrix[1][2]+=1
         elif predicted_results[k] == -1 and cm_test[k] == -1:
             confusion_matrix[2][2]+=1
         k+=1
@@ -104,7 +102,7 @@ def KNN (N,data_train,data_test,loc1,loc2,train_tags,test_tags):
 def main():
 
     #CHANGE K TO AFFECT # OF NEIGHBORS TO LOOK AT FOR KNN
-    K=5 #!!!!!IMPORTANT!!!!! DETERMINES K FOR KNN !!!!!!!!
+    K=100 #!!!!!IMPORTANT!!!!! DETERMINES K FOR KNN !!!!!!!!
 
 
 
